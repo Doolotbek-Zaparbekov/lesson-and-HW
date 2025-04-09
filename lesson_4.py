@@ -90,8 +90,14 @@ class Magic(Hero):
         super().__init__(name, health, damage, 'BOOST')
 
     def apply_super_power(self, boss: Boss, heroes: list):
-        # TODO Here will be implementation of Boosting
-        pass
+        global round_number
+        if round_number <= 4:
+            boost = randint(2, 4)
+            for hero in heroes:
+                if hero.health > 0 and hero.damage != 0:
+                    hero.damage += boost
+                    print(f'Magic {self.name} boosted {hero.name} by {boost} damage')
+
 
 
 class Healer(Hero):
@@ -121,6 +127,51 @@ class Berserk(Hero):
     def apply_super_power(self, boss: Boss, heroes: list):
         boss.health -= self.blocked_damage
         print(f'Berserk {self.name} reverted {self.blocked_damage} damage to boss.')
+
+class Witcher(Hero):
+    def __init__(self, name, health,):
+        super().__init__(name, health, 0, 'REVIVAL')
+        self.__used_power = False
+    def apply_super_power(self, boss: Boss, heroes: list):
+        if not self.__used_power:
+            for hero in heroes:
+                if hero.health <= 0 and hero != self:
+                    hero.health = self.health
+                    self.health = 0
+                    self.__used_power = True
+                    print(f'Witcher {self.name} revived {hero.name}')
+                    break
+
+class Hacker(Hero):
+    def __init__(self, name, health, damage):
+        super().__init__(name, health, damage, 'HACKING')
+    def apply_super_power(self, boss: Boss, heroes: list):
+        global round_number
+        if round_number % 2 == 0:
+            rand = randint(5, 10)
+            hero: Hero = choice(heroes)
+            boss.health -= rand
+            hero.health += rand
+            print(f'The hacker {self.name} stole {rand} health from the boss and gave it to an ally {hero.name}')
+class King(Hero):
+    def __init__(self, name, health):
+        super().__init__(name, health, 0, 'Saitama')
+    def apply_super_power(self, boss: Boss, heroes: list ):
+        if randint(1, 10) == 10:
+            print(f'{self.name} calls Saitama')
+            boss.health = 0
+            print(f'Saitama kills the boss with ONE PUNCH')
+class Samurai(Hero):
+    def __init__(self, name, health, damage):
+        super().__init__(name, health,damage, 'Shuriken')
+    def apply_super_power(self, boss: Boss, heroes: list):
+        rand = randint(5, 15)
+        if choice([1, 2]) == 1:
+            boss.health -= rand
+            print(f'The boss was poisoned: -{rand} health')
+        else:
+            boss.health += rand
+            print(f'The boss received the antidote: +{rand} health')
 
 
 round_number = 0
@@ -162,8 +213,12 @@ def start_game():
     doc = Healer('Aibolit', 250, 5, 15)
     assistant = Healer('Dulittle', 300, 5, 5)
     berserk = Berserk('Guts', 260, 10)
+    witcher = Witcher('Achil', 500)
+    hacker = Hacker('VAVAN', 300, 5)
+    kihg = King('King', 350)
+    samurai = Samurai('Deadpool', 270, 15)
 
-    heroes_list = [warrior_1, doc, warrior_2, magic, berserk, assistant]
+    heroes_list = [warrior_1, doc, warrior_2, magic, berserk, assistant, witcher, hacker, kihg, samurai]
 
     show_statistics(boss, heroes_list)
     while not is_game_over(boss, heroes_list):
